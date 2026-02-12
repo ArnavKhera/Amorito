@@ -49,6 +49,7 @@
       z-index: 5;
     }
 
+    /* Swap your graphic here by changing the SVG below or replacing it with an <img> */
     .art {
       width: min(220px, 70vw);
       margin: 0 auto 10px;
@@ -66,6 +67,7 @@
       margin-bottom: 25px;
       font-weight: 400;
       color: #555;
+      min-height: 1.5em;
     }
 
     .button-zone {
@@ -76,7 +78,6 @@
       min-height: 100px;
     }
 
-    /* LOCKED YES BUTTON - No scaling allowed */
     #yesBtn {
       padding: 16px 36px;
       font-size: 18px;
@@ -87,15 +88,13 @@
       background: var(--yes);
       color: #fff;
       box-shadow: 0 8px 20px rgba(255, 59, 122, 0.3);
+      /* FIXED: No more growing */
       transform: scale(1) !important; 
       transition: background 0.2s ease;
     }
 
-    #yesBtn:hover {
-      background: var(--yesHover);
-    }
+    #yesBtn:hover { background: var(--yesHover); }
 
-    /* NO BUTTON */
     #noBtn {
       padding: 16px 36px;
       font-size: 18px;
@@ -105,20 +104,13 @@
       cursor: pointer;
       background: #e5e7eb;
       color: #111827;
-      position: relative;
-      z-index: 1000; /* Always on top */
+      position: relative; /* Starts relative to the flexbox */
+      z-index: 1000;
       transition: left 0.15s ease-out, top 0.15s ease-out;
     }
 
-    .result-content {
-      display: none;
-    }
-
-    .fireworks {
-      width: min(350px, 85vw);
-      border-radius: 15px;
-      margin-top: 20px;
-    }
+    .result-content { display: none; }
+    .fireworks { width: min(350px, 85vw); border-radius: 15px; margin-top: 20px; }
   </style>
 </head>
 
@@ -172,21 +164,27 @@
     let currentStep = 0;
     let hasMovedNo = false;
 
-    // --- NO BUTTON LOGIC ---
+    // --- RESET NO BUTTON FUNCTION ---
+    function resetNoButton() {
+      hasMovedNo = false;
+      noBtn.style.position = "relative"; // Put it back in the flexbox
+      noBtn.style.left = "auto";
+      noBtn.style.top = "auto";
+    }
+
+    // --- NO BUTTON RUNAWAY LOGIC ---
     function moveNo() {
       if (!hasMovedNo) {
-        noBtn.style.position = "fixed";
+        noBtn.style.position = "fixed"; // Take it out of flow to move anywhere
         hasMovedNo = true;
       }
 
-      const padding = 50; // High padding to keep it away from edges
+      const padding = 60;
       const b = noBtn.getBoundingClientRect();
       
-      // Calculate available screen space
       const maxX = window.innerWidth - b.width - padding;
       const maxY = window.innerHeight - b.height - padding;
 
-      // Random position strictly within visible bounds
       const randomX = Math.max(padding, Math.random() * maxX);
       const randomY = Math.max(padding, Math.random() * maxY);
 
@@ -194,14 +192,13 @@
       noBtn.style.top = randomY + "px";
     }
 
-    // Trigger move when mouse is near
     window.addEventListener("pointermove", (e) => {
+      if (currentStep >= sequence.length + 1) return; // Stop if finished
       const b = noBtn.getBoundingClientRect();
       const distance = Math.hypot(
         (b.left + b.width / 2) - e.clientX,
         (b.top + b.height / 2) - e.clientY
       );
-
       if (distance < 100) { moveNo(); }
     });
 
@@ -211,6 +208,7 @@
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
         currentStep++;
+        resetNoButton(); // Snaps it back for the next question!
       } else {
         interactiveContent.style.display = "none";
         resultArea.style.display = "block";
@@ -218,7 +216,6 @@
       }
     });
 
-    // Prevent clicking "No" via keyboard or accidental clicks
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       moveNo();
@@ -232,26 +229,13 @@
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
-
     const confettiInstance = confetti.create(confettiCanvas, { resize: false });
 
     function fullScreenConfetti() {
       const end = Date.now() + 3000;
       (function frame() {
-        confettiInstance({
-          particleCount: 5,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: ['#ff3b7a', '#ffffff', '#ffd6e7']
-        });
-        confettiInstance({
-          particleCount: 5,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: ['#ff3b7a', '#ffffff', '#ffd6e7']
-        });
+        confettiInstance({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff3b7a', '#ffffff'] });
+        confettiInstance({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff3b7a', '#ffffff'] });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
     }
