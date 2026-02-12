@@ -37,8 +37,9 @@
     }
 
     .card {
-      width: min(720px, 92vw);
-      padding: 30px 22px;
+      /* 1. INCREASED CARD WIDTH */
+      width: min(900px, 95vw); 
+      padding: 40px 25px;
       background: var(--card);
       backdrop-filter: blur(10px);
       border-radius: 22px;
@@ -47,28 +48,38 @@
       z-index: 5;
     }
 
-    /* CONTAINER FOR MULTIPLE IMAGES */
+    /* 2. ENLARGED IMAGE CONTAINER */
     .image-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
       flex-wrap: wrap;
-      margin-bottom: 15px;
-      min-height: 200px;
+      margin-bottom: 25px;
+      /* Ensures the card doesn't "jump" too much between steps */
+      min-height: 350px; 
     }
 
     .art {
-      height: min(180px, 30vh);
+      /* 3. INCREASED IMAGE SIZE */
+      height: auto;
+      max-height: 400px; /* Much taller than before */
       width: auto;
+      max-width: 45%; /* Allows two large images side-by-side */
       border-radius: 12px;
-      object-fit: contain;
-      /* ANIMATION: Fade In */
+      object-fit: cover;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       animation: fadeIn 0.8s ease forwards;
     }
 
+    /* For single images, let them take up more space */
+    .art:only-child {
+        max-width: 80%;
+        max-height: 450px;
+    }
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -131,7 +142,7 @@
   <main class="card" id="mainCard">
     <div id="interactiveContent">
       <div id="imageWrapper" class="image-container">
-        <img class="art" src="images/us.heic">
+        <img class="art" src="images/a_silly_goose_and_his_cutie_duckie.jpg">
       </div>
 
       <h1 id="questionText">Henlooooo meri jaaneman!!!</h1>
@@ -144,8 +155,8 @@
     </div>
 
     <div id="resultArea" class="result-content">
-      <h1>YAY! 🎉</h1>      
-      <h3 id="subText">I hope you liked it my koa bear!!!</h3>
+      <h1>I hope you liked this jaanu</h1>      
+      <h3 id="subText">Here's Nina's rendition of one of our favorite moments!</h3>
       <div id="finalImages" class="image-container">
          <img class="fireworks" src="images/koa_bear.png">
       </div>
@@ -166,7 +177,7 @@
     // Add as many URLs as you want to the 'imgs' array for each step.
     const sequence = [
       { 
-        q: "I miss you so so so much, I can't wait to be together again my love", 
+        q: "I miss you SO much and I can't wait to be together again my love", 
         s: "Are you also excited to be together again meri ponturito?",
         imgs: [
           "images/i_cant_wait_to_see_her_again.heic",
@@ -174,34 +185,51 @@
         ]
       },
       { 
-        q: "Are you sure you're not just being nice?", 
-        s: "Pinky promise??",
+        q: "I wish I was about to go to sleep snuggling with you", 
+        s: "Do you also miss naps and snuggles together?",
         imgs: [
-          "https://media.giphy.com/media/C9x0nrktYlqCclX94H/giphy.gif"
+          "images/garden_nap.heic",
+          "images/grass_nap.heic"
         ]
       },
       { 
-        q: "Will you be my Valentine?", 
-        s: "Say yes to the best! ❤️",
+        q: "I want to walk around randomly and travel so many places with you pontu pie", 
+        s: "Will you show me the world?",
         imgs: [
-          "https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif",
-          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnZueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif"
+          "images/wing_in_wing.heic",
+          "images/wing_in_wing_text.heic"
         ]
       },
       { 
-        q: "Will you be my Valentine?", 
-        s: "Say yes to the best! ❤️",
+        q: "I want to make and eat so many more yummy foods with you", 
+        s: "Will you be my perfect cooking partner?",
         imgs: [
-          "https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif",
-          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnZueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif"
+          "images/pie.heic",
+          "images/pie_text.heic"
+        ]
+      },=
+      { 
+        q: "You make me the happiest I have ever been", 
+        s: "",
+        imgs: [
+          "images/i_am_the_happiest_when_i_am_with_her.heic",
+          "images/i_am_the_happiest_when_i_am_with_her_text.heic"
         ]
       },
       { 
-        q: "Will you be my Valentine?", 
-        s: "Say yes to the best! ❤️",
+        q: "", 
+        s: "So this format of asking a yes/no question was originally for a Valentine's Day ask, so will you be my Valentine?",
         imgs: [
-          "https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif",
-          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnZueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif"
+          "images/me_and_you.heic",
+          "images/you_and_me.heic",
+          "images/us.heic"
+        ]
+      },
+      { 
+        q: "This year and every year?", 
+        s: "",
+        imgs: [
+          "images/i_want_to_be_with_her_for_the_rest_of_my_life.heic"
         ]
       }
     ];
