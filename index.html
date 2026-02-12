@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Will you be my Valentine?</title>
-
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
@@ -25,7 +24,7 @@
       place-items: center;
       background: radial-gradient(circle at top, var(--bg2), var(--bg1));
       font-family: system-ui, sans-serif;
-      overflow: hidden; /* Keeps scrollbars away */
+      overflow: hidden; 
     }
 
     #confettiCanvas {
@@ -41,7 +40,7 @@
       width: min(720px, 92vw);
       padding: 30px 22px;
       background: var(--card);
-      backdrop-filter: blur(10px); /* This was causing the coordinate bug! */
+      backdrop-filter: blur(10px);
       border-radius: 22px;
       text-align: center;
       box-shadow: 0 18px 60px rgba(0,0,0,.15);
@@ -65,7 +64,6 @@
       margin-bottom: 25px;
       font-weight: 400;
       color: #555;
-      min-height: 1.5em;
     }
 
     .button-zone {
@@ -84,7 +82,6 @@
       border: none;
       cursor: pointer;
       box-shadow: 0 10px 24px rgba(0,0,0,.14);
-      transition: background 0.2s ease;
       user-select: none;
     }
 
@@ -92,13 +89,18 @@
       background: var(--yes);
       color: #fff;
       z-index: 10;
+      transition: background 0.2s ease;
+      /* Crucial: Forces the button to never change size */
+      transform: scale(1) !important; 
     }
     #yesBtn:hover { background: var(--yesHover); }
 
     #noBtn {
       background: #e5e7eb;
       color: #111827;
-      z-index: 9999; /* Ensure it floats above everything */
+      z-index: 9999; /* Always on top */
+      /* Note: We removed the transition on 'left' and 'top' to prevent glitching */
+      transition: background 0.2s ease; 
     }
 
     .result-content { display: none; }
@@ -156,64 +158,62 @@
 
     let currentStep = 0;
 
-    // --- THE FIX: DOM MANIPULATION ---
     function moveNo() {
-      // 1. Move button to BODY to escape the card's coordinate trap
+      // 1. Move the button to the BODY to escape the Card's "trap"
       if (noBtn.parentNode !== document.body) {
         document.body.appendChild(noBtn);
       }
+      noBtn.style.position = "fixed"; // Fixed ensures it's relative to screen, not card
 
-      noBtn.style.position = "absolute";
+      // 2. Calculate the "Playground" based on the viewport size
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const btnWidth = noBtn.offsetWidth;
+      const btnHeight = noBtn.offsetHeight;
 
-      // 2. Get viewport dimensions (robust check)
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const btnW = noBtn.offsetWidth;
-      const btnH = noBtn.offsetHeight;
-
-      // 3. Calculate safe area (padding from edges)
-      const padding = 200;
+      // 3. Orbit Logic: Keep the button somewhat near the center
+      // Instead of random(0, width), we do center ± range
+      // This prevents it from ending up in the far corner of a huge monitor
+      const centerX = viewportWidth / 2;
+      const centerY = viewportHeight / 2;
       
-      const maxX = w - btnW - padding;
-      const maxY = h - btnH - padding;
+      const rangeX = viewportWidth * 0.3; // Allow it to move 30% left or right
+      const rangeY = viewportHeight * 0.3;
 
-      // 4. Randomize strictly within view
-      const randX = Math.floor(Math.random() * (maxX - padding) + padding);
-      const randY = Math.floor(Math.random() * (maxY - padding) + padding);
+      let randomX = centerX + (Math.random() - 0.5) * 2 * rangeX;
+      let randomY = centerY + (Math.random() - 0.5) * 2 * rangeY;
 
-      // 5. Apply
-      noBtn.style.left = randX + "px";
-      noBtn.style.top = randY + "px";
+      // 4. Strict Boundary Check (The "Wall")
+      // Ensure it never goes off screen edges
+      const padding = 20;
+      randomX = Math.max(padding, Math.min(randomX, viewportWidth - btnWidth - padding));
+      randomY = Math.max(padding, Math.min(randomY, viewportHeight - btnHeight - padding));
+
+      // 5. Apply coordinates
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
     }
 
-    // --- RESET: BRING IT HOME ---
     function resetNoButton() {
-      // Put the button back into the card container
+      // Put the button back in its home inside the card
       buttonZone.appendChild(noBtn);
-      
-      // Clear the "run away" styles so it sits nicely in the flexbox
-      noBtn.style.position = "static";
-      noBtn.style.left = "auto";
-      noBtn.style.top = "auto";
+      noBtn.style.position = "static"; // Reset to normal flow
+      noBtn.style.transform = "none";
     }
 
+    // Trigger movement when mouse gets close
     window.addEventListener("pointermove", (e) => {
-      // Get the button's current position (wherever it is in the DOM)
       const rect = noBtn.getBoundingClientRect();
+      const distance = Math.hypot(
+        e.clientX - (rect.left + rect.width / 2),
+        e.clientY - (rect.top + rect.height / 2)
+      );
       
-      // Calculate center of button
-      const btnX = rect.left + rect.width / 2;
-      const btnY = rect.top + rect.height / 2;
-
-      // Distance formula
-      const dist = Math.hypot(e.clientX - btnX, e.clientY - btnY);
-
-      // Run if close (100px radius)
-      if (dist < 100) {
-        moveNo();
-      }
+      // If mouse is within 100px, jump!
+      if (distance < 100) moveNo();
     });
 
+    // Also trigger on click/tap just in case they catch it
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       moveNo();
@@ -224,7 +224,7 @@
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
         currentStep++;
-        resetNoButton(); // Bring the prodigal button home
+        resetNoButton(); // Bring it back
       } else {
         interactiveContent.style.display = "none";
         resultArea.style.display = "block";
@@ -232,7 +232,6 @@
       }
     });
 
-    // --- CONFETTI ---
     const confettiCanvas = document.getElementById("confettiCanvas");
     function resizeCanvas() {
       confettiCanvas.width = window.innerWidth;
