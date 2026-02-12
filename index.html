@@ -47,10 +47,15 @@
       z-index: 5;
     }
 
+    /* Styled the image to match the previous SVG size */
     .art {
-      width: min(220px, 70vw);
-      margin: 0 auto 10px;
+      width: auto;
+      height: min(200px, 40vh);
+      max-width: 100%;
+      margin: 0 auto 15px;
       display: block;
+      border-radius: 12px;
+      object-fit: contain;
     }
 
     h1 {
@@ -90,7 +95,6 @@
       color: #fff;
       z-index: 10;
       transition: background 0.2s ease;
-      /* Crucial: Forces the button to never change size */
       transform: scale(1) !important; 
     }
     #yesBtn:hover { background: var(--yesHover); }
@@ -98,8 +102,7 @@
     #noBtn {
       background: #e5e7eb;
       color: #111827;
-      z-index: 9999; /* Always on top */
-      /* Note: We removed the transition on 'left' and 'top' to prevent glitching */
+      z-index: 9999;
       transition: background 0.2s ease; 
     }
 
@@ -113,17 +116,7 @@
 
   <main class="card" id="mainCard">
     <div id="interactiveContent">
-      <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="fur" x1="0" x2="1"><stop offset="0" stop-color="#f7c7a1"/><stop offset="1" stop-color="#f2a97b"/></linearGradient>
-          <linearGradient id="heart" x1="0" x2="1"><stop offset="0" stop-color="#ff4d7d"/><stop offset="1" stop-color="#ff1f68"/></linearGradient>
-        </defs>
-        <path d="M250 50 C250 33 270 25 282 38 C294 25 314 33 314 50 C314 78 282 92 282 106 C282 92 250 78 250 50Z" fill="url(#heart)"/>
-        <path d="M90 120 C90 70 140 40 190 60 C240 40 290 70 290 120 C290 180 240 210 190 210 C140 210 90 180 90 120Z" fill="url(#fur)"/>
-        <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/><path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
-        <circle cx="160" cy="130" r="8"/><circle cx="220" cy="130" r="8"/>
-        <path d="M190 144 C186 144 182 148 182 152 C182 160 190 164 190 170 C190 164 198 160 198 152 C198 148 194 144 190 144Z" fill="#ff7aa2"/>
-      </svg>
+      <img id="mainImage" class="art" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif" alt="Cute Cat">
 
       <h1 id="questionText">Henlo meri jaaneman!!!</h1>
       <h3 id="subText">I made this website for you. You like it right???</h3>
@@ -135,85 +128,90 @@
     </div>
 
     <div id="resultArea" class="result-content">
-      <h1>YAY! 🎉</h1>
-      <img class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
+      <h1 id="finalTitle">YAY! 🎉</h1>
+      <img id="finalImage" class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
     </div>
   </main>
 
   <script>
     const questionText = document.getElementById("questionText");
     const subText = document.getElementById("subText");
+    const mainImage = document.getElementById("mainImage");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const buttonZone = document.getElementById("buttonZone");
     const interactiveContent = document.getElementById("interactiveContent");
     const resultArea = document.getElementById("resultArea");
 
+    // --- CONFIGURATION: CHANGE YOUR IMAGES HERE ---
     const sequence = [
-      { q: "Wait, so you REALLY like it?", s: "I spent forever on this! 🥹" },
-      { q: "Are you sure you're not just being nice?", s: "Pinky promise??" },
-      { q: "Is that your final answer?", s: "Think very carefully..." },
-      { q: "Will you be my Valentine?", s: "Say yes to the best! ❤️" }
+      { 
+        q: "Wait, so you REALLY like it?", 
+        s: "I spent forever on this! 🥹",
+        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnZueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/K1tgb1nPL6hZ6/giphy.gif"
+      },
+      { 
+        q: "Are you sure you're not just being nice?", 
+        s: "Pinky promise??",
+        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/C9x0nrktYlqCclX94H/giphy.gif"
+      },
+      { 
+        q: "Is that your final answer?", 
+        s: "Think very carefully...",
+        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/8vQSQ3cNXuDGo/giphy.gif"
+      },
+      { 
+        q: "Will you be my Valentine?", 
+        s: "Say yes to the best! ❤️",
+        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/ICOgUNoMPvGZG/giphy.gif"
+      }
     ];
 
     let currentStep = 0;
 
     function moveNo() {
-      // 1. Move the button to the BODY to escape the Card's "trap"
       if (noBtn.parentNode !== document.body) {
         document.body.appendChild(noBtn);
       }
-      noBtn.style.position = "fixed"; // Fixed ensures it's relative to screen, not card
+      noBtn.style.position = "fixed";
 
-      // 2. Calculate the "Playground" based on the viewport size
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const btnWidth = noBtn.offsetWidth;
       const btnHeight = noBtn.offsetHeight;
 
-      // 3. Orbit Logic: Keep the button somewhat near the center
-      // Instead of random(0, width), we do center ± range
-      // This prevents it from ending up in the far corner of a huge monitor
       const centerX = viewportWidth / 2;
       const centerY = viewportHeight / 2;
       
-      const rangeX = viewportWidth * 0.3; // Allow it to move 30% left or right
+      const rangeX = viewportWidth * 0.3; 
       const rangeY = viewportHeight * 0.3;
 
       let randomX = centerX + (Math.random() - 0.5) * 2 * rangeX;
       let randomY = centerY + (Math.random() - 0.5) * 2 * rangeY;
 
-      // 4. Strict Boundary Check (The "Wall")
-      // Ensure it never goes off screen edges
       const padding = 20;
       randomX = Math.max(padding, Math.min(randomX, viewportWidth - btnWidth - padding));
       randomY = Math.max(padding, Math.min(randomY, viewportHeight - btnHeight - padding));
 
-      // 5. Apply coordinates
       noBtn.style.left = `${randomX}px`;
       noBtn.style.top = `${randomY}px`;
     }
 
     function resetNoButton() {
-      // Put the button back in its home inside the card
       buttonZone.appendChild(noBtn);
-      noBtn.style.position = "static"; // Reset to normal flow
+      noBtn.style.position = "static";
       noBtn.style.transform = "none";
     }
 
-    // Trigger movement when mouse gets close
     window.addEventListener("pointermove", (e) => {
       const rect = noBtn.getBoundingClientRect();
       const distance = Math.hypot(
         e.clientX - (rect.left + rect.width / 2),
         e.clientY - (rect.top + rect.height / 2)
       );
-      
-      // If mouse is within 100px, jump!
       if (distance < 100) moveNo();
     });
 
-    // Also trigger on click/tap just in case they catch it
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       moveNo();
@@ -221,10 +219,13 @@
 
     yesBtn.addEventListener("click", () => {
       if (currentStep < sequence.length) {
+        // Change text AND image
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
+        mainImage.src = sequence[currentStep].img;
+        
         currentStep++;
-        resetNoButton(); // Bring it back
+        resetNoButton();
       } else {
         interactiveContent.style.display = "none";
         resultArea.style.display = "block";
