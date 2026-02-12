@@ -67,6 +67,7 @@
       margin: 0 0 18px;
       font-weight: 400;
       color: #555;
+      min-height: 1.5em;
     }
 
     .button-zone {
@@ -86,20 +87,21 @@
       cursor: pointer;
       box-shadow: 0 10px 24px rgba(0,0,0,.14);
       user-select: none;
-      transition: transform .12s ease, background .12s ease;
+      transition: background .12s ease; /* Removed transform transition */
     }
 
     #yesBtn {
       background: var(--yes);
       color: #fff;
-      z-index: 11; /* Keep Yes above No */
+      z-index: 11;
     }
     #yesBtn:hover { background: var(--yesHover); }
 
     #noBtn {
       background: #e5e7eb;
       color: #111827;
-      position: relative; /* Starts relative, JS will make it absolute/fixed to run */
+      position: relative;
+      transition: left 0.1s ease-out, top 0.1s ease-out; /* Smooth slide */
     }
 
     .result {
@@ -173,7 +175,6 @@
     const result = document.getElementById("result");
     const confettiCanvas = document.getElementById("confettiCanvas");
 
-    /* ---------- CONFIGURATION ---------- */
     const sequence = [
       { q: "Wait, so you REALLY like it?", s: "I spent 5 minutes on the CSS!" },
       { q: "Are you sure you're not just being nice?", s: "Be honest now..." },
@@ -182,60 +183,54 @@
     ];
 
     let currentStep = 0;
-    let yesScale = 1;
     let hasMovedNo = false;
 
-    /* ---------- CONTENT UPDATER ---------- */
     function nextQuestion() {
       if (currentStep < sequence.length) {
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
         currentStep++;
-        
-        // Slightly grow Yes button each time
-        yesScale += 0.15;
-        yesBtn.style.transform = `scale(${yesScale})`;
       } else {
         showFinalResult();
       }
     }
 
     function showFinalResult() {
-      questionText.style.display = "none";
-      subText.style.display = "none";
-      buttonZone.style.display = "none";
-      result.style.display = "block";
+      document.getElementById("mainCard").style.display = "none";
+      // We show the result outside or just clear the card
+      const card = document.getElementById("mainCard");
+      card.innerHTML = `
+        <h2>YAY! 🎉</h2>
+        <img class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
+      `;
+      card.style.display = "block";
       fullScreenConfetti();
     }
 
-    /* ---------- NO BUTTON RUNAWAY ---------- */
-    function moveNo(e) {
-      // First time moving? Change to fixed position so it can go anywhere
+    function moveNo() {
       if (!hasMovedNo) {
         noBtn.style.position = "fixed";
         hasMovedNo = true;
       }
 
-      const padding = 20;
-      const b = noBtn.getBoundingClientRect();
+      const padding = 30; // Safety margin from screen edges
+      const btnRect = noBtn.getBoundingClientRect();
       
-      // Calculate a random position within the entire viewport
-      // ensuring the button doesn't go off-screen
-      const maxX = window.innerWidth - b.width - padding;
-      const maxY = window.innerHeight - b.height - padding;
-      
-      const newX = Math.random() * maxX;
-      const newY = Math.random() * maxY;
+      // Calculate max available space
+      const maxX = window.innerWidth - btnRect.width - padding;
+      const maxY = window.innerHeight - btnRect.height - padding;
+
+      // Ensure we don't get negative values on tiny screens
+      const safeMaxX = Math.max(padding, maxX);
+      const safeMaxY = Math.max(padding, maxY);
+
+      const newX = Math.random() * (safeMaxX - padding) + padding;
+      const newY = Math.random() * (safeMaxY - padding) + padding;
 
       noBtn.style.left = `${newX}px`;
       noBtn.style.top = `${newY}px`;
-      
-      // Make Yes grow even more when they try to click No
-      yesScale += 0.05;
-      yesBtn.style.transform = `scale(${yesScale})`;
     }
 
-    // Trigger movement when mouse gets close
     window.addEventListener("pointermove", (e) => {
       const b = noBtn.getBoundingClientRect();
       const distance = Math.hypot(
@@ -243,17 +238,19 @@
         (b.top + b.height / 2) - e.clientY
       );
 
-      // If mouse is within 100px, move the button
-      if (distance < 100) {
-        moveNo(e);
+      // If mouse is within 120px, escape!
+      if (distance < 120) {
+        moveNo();
       }
     });
 
-    /* ---------- EVENT LISTENERS ---------- */
     yesBtn.addEventListener("click", nextQuestion);
-    noBtn.addEventListener("click", (e) => e.preventDefault());
+    noBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        moveNo(); // One last jump if they somehow manage to click it
+    });
 
-    /* ---------- CONFETTI SYSTEM ---------- */
+    /* ---------- CONFETTI ---------- */
     function resizeConfettiCanvas() {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
       confettiCanvas.width = window.innerWidth * dpr;
@@ -265,11 +262,11 @@
     const confettiInstance = confetti.create(confettiCanvas, { resize: false, useWorker: true });
 
     function fullScreenConfetti() {
-      const end = Date.now() + 2000;
+      const end = Date.now() + 3000;
       (function frame() {
         confettiInstance({
-          particleCount: 10,
-          spread: 70,
+          particleCount: 7,
+          spread: 80,
           origin: { x: Math.random(), y: Math.random() - 0.2 }
         });
         if (Date.now() < end) requestAnimationFrame(frame);
