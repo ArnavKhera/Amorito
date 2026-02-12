@@ -179,14 +179,16 @@
         hasMovedNo = true;
       }
 
-      const padding = 60;
+      const padding = 200;
       const b = noBtn.getBoundingClientRect();
-      
-      const maxX = window.innerWidth - b.width - padding;
-      const maxY = window.innerHeight - b.height - padding;
 
-      const randomX = Math.max(padding, Math.random() * maxX);
-      const randomY = Math.max(padding, Math.random() * maxY);
+      // We use Math.max(0, ...) to ensure maxX and maxY are never negative
+      const maxX = Math.max(0, window.innerWidth - b.width - padding);
+      const maxY = Math.max(0, window.innerHeight - b.height - padding);
+    
+      // This ensures the button always stays within the visible area
+      const randomX = Math.random() * maxX;
+      const randomY = Math.random() * maxY;
 
       noBtn.style.left = randomX + "px";
       noBtn.style.top = randomY + "px";
