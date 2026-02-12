@@ -40,90 +40,84 @@
 
     .card {
       width: min(720px, 92vw);
-      padding: 26px 22px;
+      padding: 30px 22px;
       background: var(--card);
       backdrop-filter: blur(10px);
       border-radius: 22px;
       text-align: center;
       box-shadow: 0 18px 60px rgba(0,0,0,.15);
-      z-index: 10;
+      z-index: 5;
     }
 
     .art {
-      width: min(260px, 80vw);
+      width: min(220px, 70vw);
       margin: 0 auto 10px;
       display: block;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
     }
 
     h1 {
-      font-size: clamp(24px, 4vw, 44px);
-      margin: 12px 0 10px;
+      font-size: clamp(22px, 4vw, 40px);
+      margin: 10px 0;
       color: #333;
     }
 
     h3 {
-      font-size: clamp(16px, 3vw, 22px);
-      margin: 0 0 18px;
+      font-size: clamp(16px, 3vw, 20px);
+      margin-bottom: 25px;
       font-weight: 400;
       color: #555;
-      min-height: 1.5em;
     }
 
     .button-zone {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 20px;
-      margin-top: 20px;
-      min-height: 80px;
+      min-height: 100px;
     }
 
-    button {
-      padding: 16px 32px;
+    /* LOCKED YES BUTTON - No scaling allowed */
+    #yesBtn {
+      padding: 16px 36px;
       font-size: 18px;
       font-weight: 800;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.14);
-      user-select: none;
-      transition: background .12s ease; /* Removed transform transition */
-    }
-
-    #yesBtn {
       background: var(--yes);
       color: #fff;
-      z-index: 11;
+      box-shadow: 0 8px 20px rgba(255, 59, 122, 0.3);
+      transform: scale(1) !important; 
+      transition: background 0.2s ease;
     }
-    #yesBtn:hover { background: var(--yesHover); }
 
+    #yesBtn:hover {
+      background: var(--yesHover);
+    }
+
+    /* NO BUTTON */
     #noBtn {
+      padding: 16px 36px;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
       background: #e5e7eb;
       color: #111827;
       position: relative;
-      transition: left 0.1s ease-out, top 0.1s ease-out; /* Smooth slide */
+      z-index: 1000; /* Always on top */
+      transition: left 0.15s ease-out, top 0.15s ease-out;
     }
 
-    .result {
+    .result-content {
       display: none;
-      margin-top: 18px;
-      animation: pop .35s ease;
-    }
-
-    .result h2 {
-      font-size: clamp(30px, 4.5vw, 46px);
-      margin: 10px 0;
     }
 
     .fireworks {
-      width: min(380px, 90vw);
-      margin: 0 auto;
-      display: block;
-    }
-
-    @keyframes pop {
-      from { transform: scale(.96); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      width: min(350px, 85vw);
+      border-radius: 15px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -132,38 +126,32 @@
   <canvas id="confettiCanvas"></canvas>
 
   <main class="card" id="mainCard">
-    <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="fur" x1="0" x2="1">
-          <stop offset="0" stop-color="#f7c7a1"/>
-          <stop offset="1" stop-color="#f2a97b"/>
-        </linearGradient>
-        <linearGradient id="heart" x1="0" x2="1">
-          <stop offset="0" stop-color="#ff4d7d"/>
-          <stop offset="1" stop-color="#ff1f68"/>
-        </linearGradient>
-      </defs>
-      <path d="M250 50 C250 33 270 25 282 38 C294 25 314 33 314 50 C314 78 282 92 282 106 C282 92 250 78 250 50Z" fill="url(#heart)"/>
-      <path d="M90 120 C90 70 140 40 190 60 C240 40 290 70 290 120 C290 180 240 210 190 210 C140 210 90 180 90 120Z" fill="url(#fur)"/>
-      <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/>
-      <path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
-      <circle cx="160" cy="130" r="8"/>
-      <circle cx="220" cy="130" r="8"/>
-      <path d="M190 144 C186 144 182 148 182 152 C182 160 190 164 190 170 C190 164 198 160 198 152 C198 148 194 144 190 144Z" fill="#ff7aa2"/>
-    </svg>
+    <div id="interactiveContent">
+      <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="fur" x1="0" x2="1"><stop offset="0" stop-color="#f7c7a1"/><stop offset="1" stop-color="#f2a97b"/></linearGradient>
+          <linearGradient id="heart" x1="0" x2="1"><stop offset="0" stop-color="#ff4d7d"/><stop offset="1" stop-color="#ff1f68"/></linearGradient>
+        </defs>
+        <path d="M250 50 C250 33 270 25 282 38 C294 25 314 33 314 50 C314 78 282 92 282 106 C282 92 250 78 250 50Z" fill="url(#heart)"/>
+        <path d="M90 120 C90 70 140 40 190 60 C240 40 290 70 290 120 C290 180 240 210 190 210 C140 210 90 180 90 120Z" fill="url(#fur)"/>
+        <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/><path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
+        <circle cx="160" cy="130" r="8"/><circle cx="220" cy="130" r="8"/>
+        <path d="M190 144 C186 144 182 148 182 152 C182 160 190 164 190 170 C190 164 198 160 198 152 C198 148 194 144 190 144Z" fill="#ff7aa2"/>
+      </svg>
 
-    <h1 id="questionText">Henlo meri jaaneman!!!</h1>
-    <h3 id="subText">I made this website for you. You like it right???</h3>
+      <h1 id="questionText">Henlo meri jaaneman!!!</h1>
+      <h3 id="subText">I made this website for you. You like it right???</h3>
 
-    <section class="button-zone" id="buttonZone">
-      <button id="yesBtn">Yes</button>
-      <button id="noBtn">No</button>
-    </section>
+      <section class="button-zone">
+        <button id="yesBtn">Yes</button>
+        <button id="noBtn">No</button>
+      </section>
+    </div>
 
-    <section class="result" id="result">
-      <h2>YAY! 🎉</h2>
+    <div id="resultArea" class="result-content">
+      <h1>YAY! 🎉</h1>
       <img class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
-    </section>
+    </div>
   </main>
 
   <script>
@@ -171,66 +159,42 @@
     const subText = document.getElementById("subText");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
-    const buttonZone = document.getElementById("buttonZone");
-    const result = document.getElementById("result");
-    const confettiCanvas = document.getElementById("confettiCanvas");
+    const interactiveContent = document.getElementById("interactiveContent");
+    const resultArea = document.getElementById("resultArea");
 
     const sequence = [
-      { q: "Wait, so you REALLY like it?", s: "I spent 5 minutes on the CSS!" },
-      { q: "Are you sure you're not just being nice?", s: "Be honest now..." },
-      { q: "Is that your final answer?", s: "No take-backs allowed!" },
-      { q: "Will you be my Valentine?", s: "I promise I'm a lot of fun! ❤️" }
+      { q: "Wait, so you REALLY like it?", s: "I spent forever on this! 🥹" },
+      { q: "Are you sure you're not just being nice?", s: "Pinky promise??" },
+      { q: "Is that your final answer?", s: "Think very carefully..." },
+      { q: "Will you be my Valentine?", s: "Say yes to the best! ❤️" }
     ];
 
     let currentStep = 0;
     let hasMovedNo = false;
 
-    function nextQuestion() {
-      if (currentStep < sequence.length) {
-        questionText.innerText = sequence[currentStep].q;
-        subText.innerText = sequence[currentStep].s;
-        currentStep++;
-      } else {
-        showFinalResult();
-      }
-    }
-
-    function showFinalResult() {
-      document.getElementById("mainCard").style.display = "none";
-      // We show the result outside or just clear the card
-      const card = document.getElementById("mainCard");
-      card.innerHTML = `
-        <h2>YAY! 🎉</h2>
-        <img class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
-      `;
-      card.style.display = "block";
-      fullScreenConfetti();
-    }
-
+    // --- NO BUTTON LOGIC ---
     function moveNo() {
       if (!hasMovedNo) {
         noBtn.style.position = "fixed";
         hasMovedNo = true;
       }
 
-      const padding = 30; // Safety margin from screen edges
-      const btnRect = noBtn.getBoundingClientRect();
+      const padding = 50; // High padding to keep it away from edges
+      const b = noBtn.getBoundingClientRect();
       
-      // Calculate max available space
-      const maxX = window.innerWidth - btnRect.width - padding;
-      const maxY = window.innerHeight - btnRect.height - padding;
+      // Calculate available screen space
+      const maxX = window.innerWidth - b.width - padding;
+      const maxY = window.innerHeight - b.height - padding;
 
-      // Ensure we don't get negative values on tiny screens
-      const safeMaxX = Math.max(padding, maxX);
-      const safeMaxY = Math.max(padding, maxY);
+      // Random position strictly within visible bounds
+      const randomX = Math.max(padding, Math.random() * maxX);
+      const randomY = Math.max(padding, Math.random() * maxY);
 
-      const newX = Math.random() * (safeMaxX - padding) + padding;
-      const newY = Math.random() * (safeMaxY - padding) + padding;
-
-      noBtn.style.left = `${newX}px`;
-      noBtn.style.top = `${newY}px`;
+      noBtn.style.left = randomX + "px";
+      noBtn.style.top = randomY + "px";
     }
 
+    // Trigger move when mouse is near
     window.addEventListener("pointermove", (e) => {
       const b = noBtn.getBoundingClientRect();
       const distance = Math.hypot(
@@ -238,36 +202,55 @@
         (b.top + b.height / 2) - e.clientY
       );
 
-      // If mouse is within 120px, escape!
-      if (distance < 120) {
-        moveNo();
+      if (distance < 100) { moveNo(); }
+    });
+
+    // --- PROGRESSION LOGIC ---
+    yesBtn.addEventListener("click", () => {
+      if (currentStep < sequence.length) {
+        questionText.innerText = sequence[currentStep].q;
+        subText.innerText = sequence[currentStep].s;
+        currentStep++;
+      } else {
+        interactiveContent.style.display = "none";
+        resultArea.style.display = "block";
+        fullScreenConfetti();
       }
     });
 
-    yesBtn.addEventListener("click", nextQuestion);
+    // Prevent clicking "No" via keyboard or accidental clicks
     noBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        moveNo(); // One last jump if they somehow manage to click it
+      e.preventDefault();
+      moveNo();
     });
 
-    /* ---------- CONFETTI ---------- */
-    function resizeConfettiCanvas() {
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      confettiCanvas.width = window.innerWidth * dpr;
-      confettiCanvas.height = window.innerHeight * dpr;
+    // --- CONFETTI ---
+    const confettiCanvas = document.getElementById("confettiCanvas");
+    function resizeCanvas() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
     }
-    resizeConfettiCanvas();
-    window.addEventListener("resize", resizeConfettiCanvas);
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    const confettiInstance = confetti.create(confettiCanvas, { resize: false, useWorker: true });
+    const confettiInstance = confetti.create(confettiCanvas, { resize: false });
 
     function fullScreenConfetti() {
       const end = Date.now() + 3000;
       (function frame() {
         confettiInstance({
-          particleCount: 7,
-          spread: 80,
-          origin: { x: Math.random(), y: Math.random() - 0.2 }
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#ff3b7a', '#ffffff', '#ffd6e7']
+        });
+        confettiInstance({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#ff3b7a', '#ffffff', '#ffd6e7']
         });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
