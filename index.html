@@ -48,34 +48,38 @@
       z-index: 5;
     }
 
-    /* 2. ENLARGED IMAGE CONTAINER */
+    /* 1. Update the container to prevent wrapping */
     .image-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      gap: 10px;
+      flex-wrap: nowrap; /* Change this from 'wrap' to 'nowrap' */
       margin-bottom: 25px;
-      /* Ensures the card doesn't "jump" too much between steps */
-      min-height: 350px; 
+      min-height: 350px;
+      width: 100%;       /* Ensure it takes full card width */
+      overflow: hidden;  /* Prevents images from spilling out of the card */
     }
-
+    
+    /* 2. Update the image rules so they scale down to share the space */
     .art {
-      /* 3. INCREASED IMAGE SIZE */
       height: auto;
-      max-height: 400px; /* Much taller than before */
+      max-height: 400px;
       width: auto;
-      max-width: 45%; /* Allows two large images side-by-side */
+      /* Remove max-width: 45% and use flex-shrink instead */
+      flex-shrink: 1;    
+      min-width: 0;      /* Allows flexbox to shrink images properly */
+      max-width: 30%;    /* For 3 images, 30% each ensures they fit side-by-side */
       border-radius: 12px;
-      object-fit: cover;
+      object-fit: contain; /* 'contain' is better for photos of different sizes */
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       animation: fadeIn 0.8s ease forwards;
     }
-
-    /* For single images, let them take up more space */
+    
+    /* 3. Let a single image still be nice and large */
     .art:only-child {
-        max-width: 80%;
-        max-height: 450px;
+      max-width: 80%;
+      max-height: 450px;
     }
 
     @keyframes fadeIn {
@@ -146,8 +150,7 @@
       </div>
 
       <h1 id="questionText">Henlooooo meri jaaneman!!!</h1>
-      <h3 id="subText">A very silly goose made this website for his very cute duckie :)</h3>
-      <h3 id="subText">Do you like it???</h3>
+      <h3 id="subText">A very silly goose made this website for his very cute duckie :) <br> Do you like it???</h3>
 
       <section class="button-zone" id="buttonZone">
         <button id="yesBtn">Yes</button>
@@ -189,8 +192,8 @@
         q: "I wish I was about to go to sleep snuggling with you", 
         s: "Do you also miss naps and snuggles together?",
         imgs: [
-          "images/garden_nap.heic",
-          "images/grass_nap.heic"
+          "images/garden_nap.jpg",
+          "images/grass_nap.jpg"
         ]
       },      
       { 
