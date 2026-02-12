@@ -182,13 +182,22 @@
       const padding = 200;
       const b = noBtn.getBoundingClientRect();
 
-      // We use Math.max(0, ...) to ensure maxX and maxY are never negative
-      const maxX = Math.max(0, window.innerWidth - b.width - padding);
-      const maxY = Math.max(0, window.innerHeight - b.height - padding);
+      // 1. Get the VISIBLE window size (ignoring scrollbars)
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
     
-      // This ensures the button always stays within the visible area
-      const randomX = Math.random() * maxX;
-      const randomY = Math.random() * maxY;
+      // 2. Calculate the maximum possible X and Y
+      const maxX = vw - b.width - padding;
+      const maxY = vh - b.height - padding;
+    
+      // 3. Generate a random spot, but FORCE it to stay between 'padding' and 'max'
+      // This prevents the button from ever touching the 0,0 or the far edges
+      let randomX = Math.floor(Math.random() * (maxX - padding) + padding);
+      let randomY = Math.floor(Math.random() * (maxY - padding) + padding);
+    
+      // 4. Emergency check: If screen is too small, just put it at 10,10
+      if (maxX <= padding) randomX = 10;
+      if (maxY <= padding) randomY = 10;
 
       noBtn.style.left = randomX + "px";
       noBtn.style.top = randomY + "px";
