@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Will you be my Valentine?</title>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -20,13 +20,12 @@
 
     body {
       margin: 0;
-      min-height: 100svh;
+      min-height: 100vh;
       display: grid;
       place-items: center;
       background: radial-gradient(circle at top, var(--bg2), var(--bg1));
       font-family: system-ui, sans-serif;
-      overflow: hidden;
-      padding: 16px;
+      overflow: hidden; /* Keeps scrollbars away */
     }
 
     #confettiCanvas {
@@ -42,14 +41,13 @@
       width: min(720px, 92vw);
       padding: 30px 22px;
       background: var(--card);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px); /* This was causing the coordinate bug! */
       border-radius: 22px;
       text-align: center;
       box-shadow: 0 18px 60px rgba(0,0,0,.15);
       z-index: 5;
     }
 
-    /* Swap your graphic here by changing the SVG below or replacing it with an <img> */
     .art {
       width: min(220px, 70vw);
       margin: 0 auto 10px;
@@ -75,38 +73,32 @@
       justify-content: center;
       align-items: center;
       gap: 20px;
-      min-height: 100px;
+      min-height: 60px;
+    }
+
+    button {
+      padding: 16px 36px;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,.14);
+      transition: background 0.2s ease;
+      user-select: none;
     }
 
     #yesBtn {
-      padding: 16px 36px;
-      font-size: 18px;
-      font-weight: 800;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
       background: var(--yes);
       color: #fff;
-      box-shadow: 0 8px 20px rgba(255, 59, 122, 0.3);
-      /* FIXED: No more growing */
-      transform: scale(1) !important; 
-      transition: background 0.2s ease;
+      z-index: 10;
     }
-
     #yesBtn:hover { background: var(--yesHover); }
 
     #noBtn {
-      padding: 16px 36px;
-      font-size: 18px;
-      font-weight: 800;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
       background: #e5e7eb;
       color: #111827;
-      position: relative; /* Starts relative to the flexbox */
-      z-index: 1000;
-      transition: left 0.15s ease-out, top 0.15s ease-out;
+      z-index: 9999; /* Ensure it floats above everything */
     }
 
     .result-content { display: none; }
@@ -134,7 +126,7 @@
       <h1 id="questionText">Henlo meri jaaneman!!!</h1>
       <h3 id="subText">I made this website for you. You like it right???</h3>
 
-      <section class="button-zone">
+      <section class="button-zone" id="buttonZone">
         <button id="yesBtn">Yes</button>
         <button id="noBtn">No</button>
       </section>
@@ -151,96 +143,95 @@
     const subText = document.getElementById("subText");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
+    const buttonZone = document.getElementById("buttonZone");
     const interactiveContent = document.getElementById("interactiveContent");
     const resultArea = document.getElementById("resultArea");
-  
+
     const sequence = [
       { q: "Wait, so you REALLY like it?", s: "I spent forever on this! 🥹" },
       { q: "Are you sure you're not just being nice?", s: "Pinky promise??" },
       { q: "Is that your final answer?", s: "Think very carefully..." },
       { q: "Will you be my Valentine?", s: "Say yes to the best! ❤️" }
     ];
-  
+
     let currentStep = 0;
-  
-    // --- THE NEW MOVE LOGIC ---
+
+    // --- THE FIX: DOM MANIPULATION ---
     function moveNo() {
-      // 1. Force the button to be 'fixed' so it can move anywhere
-      noBtn.style.position = "fixed";
-      noBtn.style.margin = "0"; // Remove any jumping caused by margins
-  
-      // 2. Get the exact visible window dimensions
-      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-  
-      // 3. Get the button size
-      const btnRect = noBtn.getBoundingClientRect();
+      // 1. Move button to BODY to escape the card's coordinate trap
+      if (noBtn.parentNode !== document.body) {
+        document.body.appendChild(noBtn);
+      }
+
+      noBtn.style.position = "absolute";
+
+      // 2. Get viewport dimensions (robust check)
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const btnW = noBtn.offsetWidth;
+      const btnH = noBtn.offsetHeight;
+
+      // 3. Calculate safe area (padding from edges)
+      const padding = 30;
       
-      // 4. Set a safe "Inner Box" (10% of screen away from edges)
-      const edgeMarginX = vw * 0.1;
-      const edgeMarginY = vh * 0.1;
-  
-      const availableWidth = vw - btnRect.width - (edgeMarginX * 2);
-      const availableHeight = vh - btnRect.height - (edgeMarginY * 2);
-  
-      // 5. Calculate new position
-      // If screen is tiny, we just use a small offset, otherwise we randomize
-      let newX = edgeMarginX + Math.random() * Math.max(availableWidth, 1);
-      let newY = edgeMarginY + Math.random() * Math.max(availableHeight, 1);
-  
-      // 6. APPLY - Using translate3d is more stable than top/left for rapid movement
-      noBtn.style.left = "0";
-      noBtn.style.top = "0";
-      noBtn.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
+      const maxX = w - btnW - padding;
+      const maxY = h - btnH - padding;
+
+      // 4. Randomize strictly within view
+      const randX = Math.floor(Math.random() * (maxX - padding) + padding);
+      const randY = Math.floor(Math.random() * (maxY - padding) + padding);
+
+      // 5. Apply
+      noBtn.style.left = randX + "px";
+      noBtn.style.top = randY + "px";
     }
-  
-    // --- MOUSE TRACKING ---
+
+    // --- RESET: BRING IT HOME ---
+    function resetNoButton() {
+      // Put the button back into the card container
+      buttonZone.appendChild(noBtn);
+      
+      // Clear the "run away" styles so it sits nicely in the flexbox
+      noBtn.style.position = "static";
+      noBtn.style.left = "auto";
+      noBtn.style.top = "auto";
+    }
+
     window.addEventListener("pointermove", (e) => {
+      // Get the button's current position (wherever it is in the DOM)
       const rect = noBtn.getBoundingClientRect();
       
-      // Calculate distance between mouse and button center
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-      const btnCenterX = rect.left + rect.width / 2;
-      const btnCenterY = rect.top + rect.height / 2;
-  
-      const distance = Math.hypot(mouseX - btnCenterX, mouseY - btnCenterY);
-  
-      // If mouse gets within 80 pixels, jump!
-      if (distance < 80) {
+      // Calculate center of button
+      const btnX = rect.left + rect.width / 2;
+      const btnY = rect.top + rect.height / 2;
+
+      // Distance formula
+      const dist = Math.hypot(e.clientX - btnX, e.clientY - btnY);
+
+      // Run if close (100px radius)
+      if (dist < 100) {
         moveNo();
       }
     });
-  
-    // --- RESET LOGIC ---
-    function resetNoButton() {
-      noBtn.style.position = "relative";
-      noBtn.style.left = "auto";
-      noBtn.style.top = "auto";
-      noBtn.style.transform = "none";
-      noBtn.style.margin = ""; 
-    }
-  
-    // --- PROGRESSION ---
+
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNo();
+    });
+
     yesBtn.addEventListener("click", () => {
       if (currentStep < sequence.length) {
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
         currentStep++;
-        resetNoButton();
+        resetNoButton(); // Bring the prodigal button home
       } else {
         interactiveContent.style.display = "none";
         resultArea.style.display = "block";
         fullScreenConfetti();
       }
     });
-  
-    // Prevent any accidental clicks
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      moveNo();
-    });
-  
+
     // --- CONFETTI ---
     const confettiCanvas = document.getElementById("confettiCanvas");
     function resizeCanvas() {
@@ -250,7 +241,7 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     const confettiInstance = confetti.create(confettiCanvas, { resize: false });
-  
+
     function fullScreenConfetti() {
       const end = Date.now() + 3000;
       (function frame() {
@@ -259,6 +250,6 @@
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
     }
-</script>
+  </script>
 </body>
 </html>
