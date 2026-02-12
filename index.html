@@ -24,7 +24,7 @@
       place-items: center;
       background: radial-gradient(circle at top, var(--bg2), var(--bg1));
       font-family: system-ui, sans-serif;
-      overflow-x: hidden; 
+      overflow: hidden; 
     }
 
     #confettiCanvas {
@@ -37,6 +37,7 @@
     }
 
     .card {
+      /* 1. INCREASED CARD WIDTH */
       width: min(900px, 95vw); 
       padding: 40px 25px;
       background: var(--card);
@@ -45,9 +46,9 @@
       text-align: center;
       box-shadow: 0 18px 60px rgba(0,0,0,.15);
       z-index: 5;
-      position: relative;
     }
 
+    /* 2. ENLARGED IMAGE CONTAINER */
     .image-container {
       display: flex;
       justify-content: center;
@@ -55,20 +56,23 @@
       gap: 15px;
       flex-wrap: wrap;
       margin-bottom: 25px;
-      min-height: 400px; /* Bigger area for images */
+      /* Ensures the card doesn't "jump" too much between steps */
+      min-height: 350px; 
     }
 
     .art {
+      /* 3. INCREASED IMAGE SIZE */
       height: auto;
-      max-height: 400px; 
+      max-height: 400px; /* Much taller than before */
       width: auto;
-      max-width: 45%; 
+      max-width: 45%; /* Allows two large images side-by-side */
       border-radius: 12px;
       object-fit: cover;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       animation: fadeIn 0.8s ease forwards;
     }
 
+    /* For single images, let them take up more space */
     .art:only-child {
         max-width: 80%;
         max-height: 450px;
@@ -80,14 +84,14 @@
     }
 
     h1 {
-      font-size: clamp(24px, 5vw, 42px);
-      margin: 15px 0;
+      font-size: clamp(22px, 4vw, 40px);
+      margin: 10px 0;
       color: #333;
     }
 
     h3 {
-      font-size: clamp(16px, 3.5vw, 22px);
-      margin-bottom: 30px;
+      font-size: clamp(16px, 3vw, 20px);
+      margin-bottom: 25px;
       font-weight: 400;
       color: #555;
     }
@@ -96,13 +100,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 25px;
-      min-height: 70px;
+      gap: 20px;
+      min-height: 60px;
     }
 
     button {
-      padding: 18px 40px;
-      font-size: 20px;
+      padding: 16px 36px;
+      font-size: 18px;
       font-weight: 800;
       border-radius: 999px;
       border: none;
@@ -116,6 +120,7 @@
       color: #fff;
       z-index: 10;
       transition: background 0.2s ease;
+      transform: scale(1) !important; 
     }
     #yesBtn:hover { background: var(--yesHover); }
 
@@ -123,17 +128,11 @@
       background: #e5e7eb;
       color: #111827;
       z-index: 9999;
+      transition: background 0.2s ease; 
     }
 
     .result-content { display: none; }
-    .fireworks { 
-      width: auto; 
-      max-height: 450px; 
-      max-width: 90%; 
-      border-radius: 15px; 
-      margin-top: 20px; 
-      animation: fadeIn 0.8s ease forwards;
-    }
+    .fireworks { width: min(350px, 85vw); border-radius: 15px; margin-top: 20px; }
   </style>
 </head>
 
@@ -147,7 +146,8 @@
       </div>
 
       <h1 id="questionText">Henlooooo meri jaaneman!!!</h1>
-      <h3 id="subText">A very silly goose made this website for a cutie duckie pie!!! Hope she likes it :)</h3>
+      <h3 id="subText">A very silly goose made this website for his very cute duckie :)</h3>
+      <h3 id="subText">Do you like it???</h3>
 
       <section class="button-zone" id="buttonZone">
         <button id="yesBtn">Yes</button>
@@ -157,7 +157,7 @@
 
     <div id="resultArea" class="result-content">
       <h1>I hope you liked this jaanu</h1>      
-      <h3 id="finalSubText">Here's Nina's rendition of one of our favorite moments!</h3>
+      <h3 id="subText">Here's Nina's rendition of one of our favorite moments!</h3>
       <div id="finalImages" class="image-container">
          <img class="fireworks" src="images/koa_bear.png">
       </div>
@@ -174,46 +174,72 @@
     const interactiveContent = document.getElementById("interactiveContent");
     const resultArea = document.getElementById("resultArea");
 
+    // --- CONFIGURATION: MULTIPLE IMAGES PER STEP ---
+    // Add as many URLs as you want to the 'imgs' array for each step.
     const sequence = [
       { 
         q: "I miss you SO much and I can't wait to be together again my love", 
         s: "Are you also excited to be together again meri ponturito?",
-        imgs: ["images/i_cant_wait_to_see_her_again.jpg", "images/i_cant_wait_to_see_her_again_text.jpg"]
+        imgs: [
+          "images/i_cant_wait_to_see_her_again.heic",
+          "images/i_cant_wait_to_see_her_again_text.heic"
+        ]
       },
       { 
         q: "I wish I was about to go to sleep snuggling with you", 
         s: "Do you also miss naps and snuggles together?",
-        imgs: ["images/garden_nap.jpg", "images/grass_nap.jpg"]
+        imgs: [
+          "images/garden_nap.heic",
+          "images/grass_nap.heic"
+        ]
       },      
       { 
         q: "I want to make and eat so many more yummy foods with you", 
         s: "Will you be my perfect cooking partner?",
-        imgs: ["images/pie.jpg", "images/pie_text.jpg"]
+        imgs: [
+          "images/pie.heic",
+          "images/pie_text.heic"
+        ]
       },
       { 
         q: "I want to walk around randomly and travel so many places with you pontu pie", 
         s: "Will you show me the world?",
-        imgs: ["images/wing_in_wing.jpg", "images/wing_in_wing_text.jpg"]
+        imgs: [
+          "images/wing_in_wing.heic",
+          "images/wing_in_wing_text.heic"
+        ]
       },      
       { 
         q: "I want to learn different things and grow with you", 
         s: "Will you teach me the things I'm bad at?",
-        imgs: ["images/ice_skating.jpg", "images/ice_skating_text.jpg"]
+        imgs: [
+          "images/ice_skating.heic",
+          "images/ice_skating_text.heic"
+        ]
       },
       { 
         q: "You make me the happiest I have ever been", 
-        s: "I love you 3000.",
-        imgs: ["images/i_am_the_happiest_when_i_am_with_her.jpg", "images/i_am_the_happiest_when_i_am_with_her_text.jpg"]
+        s: "",
+        imgs: [
+          "images/i_am_the_happiest_when_i_am_with_her.heic",
+          "images/i_am_the_happiest_when_i_am_with_her_text.heic"
+        ]
       },
       { 
-        q: "Will you be my Valentine?", 
-        s: "Say yes to the best! ❤️",
-        imgs: ["images/me_and_you.jpg", "images/you_and_me.jpg", "images/us.jpg"]
+        q: "", 
+        s: "So this format of asking a yes/no question was originally for a Valentine's Day ask, so will you be my Valentine?",
+        imgs: [
+          "images/me_and_you.heic",
+          "images/you_and_me.heic",
+          "images/us.heic"
+        ]
       },
       { 
         q: "This year and every year?", 
-        s: "Forever and always.",
-        imgs: ["images/i_want_to_be_with_her_for_the_rest_of_my_life.jpg"]
+        s: "",
+        imgs: [
+          "images/i_want_to_be_with_her_for_the_rest_of_my_life.heic"
+        ]
       }
     ];
 
@@ -225,10 +251,10 @@
       const w = window.innerWidth, h = window.innerHeight;
       const bW = noBtn.offsetWidth, bH = noBtn.offsetHeight;
       const cX = w / 2, cY = h / 2;
-      const rX = w * 0.35, rY = h * 0.35;
+      const rX = w * 0.3, rY = h * 0.3;
       let x = cX + (Math.random() - 0.5) * 2 * rX;
       let y = cY + (Math.random() - 0.5) * 2 * rY;
-      const p = 30;
+      const p = 20;
       x = Math.max(p, Math.min(x, w - bW - p));
       y = Math.max(p, Math.min(y, h - bH - p));
       noBtn.style.left = `${x}px`;
@@ -241,8 +267,9 @@
       noBtn.style.transform = "none";
     }
 
+    // UPDATED: Renders multiple images with fade-in
     function updateImages(imgList) {
-      imageWrapper.innerHTML = ''; 
+      imageWrapper.innerHTML = ''; // Clear old images
       imgList.forEach(url => {
         const newImg = document.createElement('img');
         newImg.src = url;
@@ -264,6 +291,7 @@
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
         updateImages(sequence[currentStep].imgs);
+
         currentStep++;
         resetNoButton();
       } else {
@@ -274,10 +302,7 @@
     });
 
     const confettiCanvas = document.getElementById("confettiCanvas");
-    function resizeCanvas() { 
-      confettiCanvas.width = window.innerWidth; 
-      confettiCanvas.height = window.innerHeight; 
-    }
+    function resizeCanvas() { confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     const confettiInstance = confetti.create(confettiCanvas, { resize: false });
