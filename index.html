@@ -47,15 +47,29 @@
       z-index: 5;
     }
 
-    /* Styled the image to match the previous SVG size */
+    /* CONTAINER FOR MULTIPLE IMAGES */
+    .image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+      min-height: 200px;
+    }
+
     .art {
+      height: min(180px, 30vh);
       width: auto;
-      height: min(200px, 40vh);
-      max-width: 100%;
-      margin: 0 auto 15px;
-      display: block;
       border-radius: 12px;
       object-fit: contain;
+      /* ANIMATION: Fade In */
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     h1 {
@@ -116,7 +130,9 @@
 
   <main class="card" id="mainCard">
     <div id="interactiveContent">
-      <img id="mainImage" class="art" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif" alt="Cute Cat">
+      <div id="imageWrapper" class="image-container">
+        <img class="art" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif">
+      </div>
 
       <h1 id="questionText">Henlo meri jaaneman!!!</h1>
       <h3 id="subText">I made this website for you. You like it right???</h3>
@@ -128,73 +144,67 @@
     </div>
 
     <div id="resultArea" class="result-content">
-      <h1 id="finalTitle">YAY! 🎉</h1>
-      <img id="finalImage" class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif" alt="Fireworks" />
+      <h1>YAY! 🎉</h1>
+      <div id="finalImages" class="image-container">
+         <img class="fireworks" src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
+      </div>
     </div>
   </main>
 
   <script>
     const questionText = document.getElementById("questionText");
     const subText = document.getElementById("subText");
-    const mainImage = document.getElementById("mainImage");
+    const imageWrapper = document.getElementById("imageWrapper");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const buttonZone = document.getElementById("buttonZone");
     const interactiveContent = document.getElementById("interactiveContent");
     const resultArea = document.getElementById("resultArea");
 
-    // --- CONFIGURATION: CHANGE YOUR IMAGES HERE ---
+    // --- CONFIGURATION: MULTIPLE IMAGES PER STEP ---
+    // Add as many URLs as you want to the 'imgs' array for each step.
     const sequence = [
       { 
         q: "Wait, so you REALLY like it?", 
         s: "I spent forever on this! 🥹",
-        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnZueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/K1tgb1nPL6hZ6/giphy.gif"
+        imgs: [
+          "https://media.giphy.com/media/K1tgb1nPL6hZ6/giphy.gif",
+          "https://media.giphy.com/media/ICOgUNoMPvGZG/giphy.gif"
+        ]
       },
       { 
         q: "Are you sure you're not just being nice?", 
         s: "Pinky promise??",
-        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/C9x0nrktYlqCclX94H/giphy.gif"
-      },
-      { 
-        q: "Is that your final answer?", 
-        s: "Think very carefully...",
-        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/8vQSQ3cNXuDGo/giphy.gif"
+        imgs: [
+          "https://media.giphy.com/media/C9x0nrktYlqCclX94H/giphy.gif"
+        ]
       },
       { 
         q: "Will you be my Valentine?", 
         s: "Say yes to the best! ❤️",
-        img: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/ICOgUNoMPvGZG/giphy.gif"
+        imgs: [
+          "https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif",
+          "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnZueGZidXp0ZzR3Z3pueGZidXp0ZzR3Z3pueGZidXp0ZzR3dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDJ9IbxxvDUQM/giphy.gif"
+        ]
       }
     ];
 
     let currentStep = 0;
 
     function moveNo() {
-      if (noBtn.parentNode !== document.body) {
-        document.body.appendChild(noBtn);
-      }
+      if (noBtn.parentNode !== document.body) { document.body.appendChild(noBtn); }
       noBtn.style.position = "fixed";
-
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const btnWidth = noBtn.offsetWidth;
-      const btnHeight = noBtn.offsetHeight;
-
-      const centerX = viewportWidth / 2;
-      const centerY = viewportHeight / 2;
-      
-      const rangeX = viewportWidth * 0.3; 
-      const rangeY = viewportHeight * 0.3;
-
-      let randomX = centerX + (Math.random() - 0.5) * 2 * rangeX;
-      let randomY = centerY + (Math.random() - 0.5) * 2 * rangeY;
-
-      const padding = 20;
-      randomX = Math.max(padding, Math.min(randomX, viewportWidth - btnWidth - padding));
-      randomY = Math.max(padding, Math.min(randomY, viewportHeight - btnHeight - padding));
-
-      noBtn.style.left = `${randomX}px`;
-      noBtn.style.top = `${randomY}px`;
+      const w = window.innerWidth, h = window.innerHeight;
+      const bW = noBtn.offsetWidth, bH = noBtn.offsetHeight;
+      const cX = w / 2, cY = h / 2;
+      const rX = w * 0.3, rY = h * 0.3;
+      let x = cX + (Math.random() - 0.5) * 2 * rX;
+      let y = cY + (Math.random() - 0.5) * 2 * rY;
+      const p = 20;
+      x = Math.max(p, Math.min(x, w - bW - p));
+      y = Math.max(p, Math.min(y, h - bH - p));
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
     }
 
     function resetNoButton() {
@@ -203,26 +213,30 @@
       noBtn.style.transform = "none";
     }
 
+    // UPDATED: Renders multiple images with fade-in
+    function updateImages(imgList) {
+      imageWrapper.innerHTML = ''; // Clear old images
+      imgList.forEach(url => {
+        const newImg = document.createElement('img');
+        newImg.src = url;
+        newImg.className = 'art';
+        imageWrapper.appendChild(newImg);
+      });
+    }
+
     window.addEventListener("pointermove", (e) => {
       const rect = noBtn.getBoundingClientRect();
-      const distance = Math.hypot(
-        e.clientX - (rect.left + rect.width / 2),
-        e.clientY - (rect.top + rect.height / 2)
-      );
-      if (distance < 100) moveNo();
+      const dist = Math.hypot(e.clientX - (rect.left + rect.width/2), e.clientY - (rect.top + rect.height/2));
+      if (dist < 100) moveNo();
     });
 
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      moveNo();
-    });
+    noBtn.addEventListener("click", (e) => { e.preventDefault(); moveNo(); });
 
     yesBtn.addEventListener("click", () => {
       if (currentStep < sequence.length) {
-        // Change text AND image
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
-        mainImage.src = sequence[currentStep].img;
+        updateImages(sequence[currentStep].imgs);
         
         currentStep++;
         resetNoButton();
@@ -234,10 +248,7 @@
     });
 
     const confettiCanvas = document.getElementById("confettiCanvas");
-    function resizeCanvas() {
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-    }
+    function resizeCanvas() { confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
     const confettiInstance = confetti.create(confettiCanvas, { resize: false });
