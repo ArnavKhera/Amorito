@@ -39,8 +39,8 @@
 
     .card {
       /* 1. INCREASED CARD WIDTH */
-      width: min(900px, 95vw); 
-      padding: 40px 25px;
+      width: min(1200px, 98vw); 
+      padding: 40px 20px;
       background: var(--card);
       backdrop-filter: blur(10px);
       border-radius: 22px;
@@ -59,7 +59,7 @@
       margin-bottom: 25px;
       min-height: 350px;
       width: 100%;       /* Ensure it takes full card width */
-      overflow: hidden;  /* Prevents images from spilling out of the card */
+      overflow: visible;  /* Prevents images from spilling out of the card */
     }
     
     /* 2. Update the image rules so they scale down to share the space */
@@ -70,7 +70,7 @@
       /* Remove max-width: 45% and use flex-shrink instead */
       flex-shrink: 1;    
       min-width: 0;      /* Allows flexbox to shrink images properly */
-      max-width: 30%;    /* For 3 images, 30% each ensures they fit side-by-side */
+      max-width: calc(30% - 20px);
       border-radius: 12px;
       object-fit: contain; /* 'contain' is better for photos of different sizes */
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
@@ -151,7 +151,8 @@
       </div>
 
       <h1 id="questionText">Henlooooo meri jaaneman!!!</h1>
-      <h3 id="subText">A very silly goose made this website for his very cute duckie :) <br> Do you like it???</h3>
+      <h3 id="subText">A very silly goose made this website for his very cute duckie :)</h3>
+      <h3 id="extraPrompt">Do you like it???</h3>
 
       <section class="button-zone" id="buttonZone">
         <button id="yesBtn">Yes</button>
@@ -171,6 +172,7 @@
   <script>
     const questionText = document.getElementById("questionText");
     const subText = document.getElementById("subText");
+    const extraPrompt = document.getElementById("extraPrompt");
     const imageWrapper = document.getElementById("imageWrapper");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
@@ -292,8 +294,16 @@
 
     yesBtn.addEventListener("click", () => {
       if (currentStep < sequence.length) {
+        // 1. Update the texts
         questionText.innerText = sequence[currentStep].q;
         subText.innerText = sequence[currentStep].s;
+        
+        // 2. HIDE the "Do you like it???" prompt after the first click
+        if (extraPrompt) {
+          extraPrompt.style.display = "none";
+        }
+
+        // 3. Update the images
         updateImages(sequence[currentStep].imgs);
 
         currentStep++;
